@@ -9,7 +9,7 @@ The model is based on **Musixmatch/umberto-commoncrawl-cased-v1**, further adapt
 
 ## 🎯 Objective
 
-Automatically assign one or more thematic labels (e.g. *Tariffe*, *Servizio clienti*, *Trasparenza*) to customer reviews of energy providers, enabling large-scale feedback analysis and quantitative insights into customer experience.
+Automatically assign one or more thematic labels to customer reviews of energy providers, enabling large-scale feedback analysis and quantitative insights into customer experience.
 
 ---
 
@@ -43,6 +43,7 @@ Data were preprocessed with a text cleaning function preserving casing and punct
 The fine-tuned **BT-umBERTo-DAPT** model achieved strong results on the validation set using **Macro F1** as the primary metric.  
 
 Full details are provided in the [final report](https://github.com/lucaarmanni/multi-label-energy-reviews/blob/main/reports/report.pdf).
+
 
 
 
