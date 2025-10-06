@@ -29,10 +29,10 @@ Automatically assign one or more thematic labels (e.g. *Tariffe*, *Servizio clie
 
 | Dataset | Description | Samples |
 |----------|--------------|----------|
-| `training_dataset.xlsx` | Manually labeled dataset | 1,742 |
-| `training_dataset_augmented.xlsx` | Back-translated dataset (+335 synthetic reviews) | 2,077 |
-| [`sample_input.xlsx`](./data/sample_input.xlsx) | 10 recensioni di esempio per testare il modello | 10  | Test rapido |
-| [`Recensioni_OCTOPUS.xlsx`](./data/Recensioni_OCTOPUS.xlsx) | Dataset reale di recensioni dei clienti Octopus Energy | 10279  | Inferenza completa |
+| [`training_dataset.xlsx`](./data/training_dataset.xlsx) | Manually labeled dataset | 1,742 |
+| [`training_dataset_augmented.xlsx`](./data/training_dataset_augmented.xlsx) | Back-translated dataset (+335 synthetic reviews) | 2,077 |
+| [`sample_input.xlsx`](./data/sample_input.xlsx) | sample dataset for testing | 10  | quick test |
+| [`Recensioni_OCTOPUS.xlsx`](./data/Recensioni_OCTOPUS.xlsx) | Real-world dataset of customer reviews for octopus energy | 10279  | Full Inference |
 Each review can have multiple labels (multi-hot encoding).  
 Data were preprocessed with a text cleaning function preserving casing and punctuation.
 
