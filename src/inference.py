@@ -14,7 +14,7 @@ from utils.text_cleaning import clean_text
 # CONFIGURAZIONE
 # =========================================================
 # ID del tuo modello su Hugging Face Hub
-MODEL_ID = "lucaarmanni/umberto-energy-reviews-classifier" 
+MODEL_ID ="armaxj/energy-reviews-mlc"
 
 # Percorso dei dataset di input e output
 DATA_DIR = os.path.abspath("../data")
@@ -83,3 +83,4 @@ if __name__ == "__main__":
     for input_name, output_name in DATASETS:
         run_inference(input_name, output_name)
     print("🏁 Tutte le inferenze completate con successo!")
+
