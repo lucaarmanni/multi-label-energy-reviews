@@ -2,9 +2,9 @@
 # inference.py 
 # ============================================
 
+
 import os
 import torch
-import zipfile
 import pandas as pd
 from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
@@ -13,13 +13,10 @@ from utils.text_cleaning import clean_text
 # =========================================================
 # CONFIGURAZIONE
 # =========================================================
+# ID del tuo modello su Hugging Face Hub
+MODEL_ID = "lucaarmanni/umberto-energy-reviews-classifier" 
 
-# Percorso della cartella modelli nella repo
-BASE_MODEL_DIR = os.path.abspath("../models")
-MODEL_FOLDER = os.path.join(BASE_MODEL_DIR, "best-umBERTo-DBLoss-BT")
-MODEL_ZIP = os.path.join(BASE_MODEL_DIR, "best-umBERTo-DBLoss-BT.zip")
-
-# Percorso dei dataset
+# Percorso dei dataset di input e output
 DATA_DIR = os.path.abspath("../data")
 DATASETS = [
     ("sample_input.xlsx", "predicted_sample_input.xlsx"),
@@ -27,49 +24,21 @@ DATASETS = [
 ]
 
 # =========================================================
-# 1️⃣ Caricamento o estrazione automatica del modello
-# =========================================================
-if not os.path.exists(MODEL_FOLDER):
-    if os.path.exists(MODEL_ZIP):
-        print(f"📦 File zip del modello trovato: {MODEL_ZIP}")
-        print("Estrazione in corso...")
-        with zipfile.ZipFile(MODEL_ZIP, 'r') as zip_ref:
-            zip_ref.extractall(BASE_MODEL_DIR)
-        print("✅ Modello estratto correttamente in:", MODEL_FOLDER)
-    else:
-        print("❌ ERRORE: il modello non è presente nella cartella 'models/'.")
-        print("Scarica il file .zip dal link indicato in models/README.md")
-        raise FileNotFoundError("Modello mancante. Consulta il file models/README.md per scaricarlo.")
-
-# =========================================================
-# 2️⃣ Caricamento del tokenizer e del modello
+# CARICAMENTO MODELLO DA HUB
 # =========================================================
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"\n🚀 Avvio inferenza... (device: {device})")
-print(f"Caricamento modello da: {MODEL_FOLDER}")
+print(f"Caricamento modello da Hugging Face Hub: {MODEL_ID}")
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_FOLDER, local_files_only=True)
-model = AutoModelForSequenceClassification.from_pretrained(MODEL_FOLDER, local_files_only=True).to(device)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+model = AutoModelForSequenceClassification.from_pretrained(MODEL_ID).to(device)
 model.eval()
 
-# =========================================================
-# 3️⃣ Ricostruzione dinamica della mappatura etichette
-# =========================================================
-TRAINING_FILE = os.path.join(DATA_DIR, "training_dataset.xlsx")
-try:
-    print(f"\n🔍 Lettura della mappatura etichette da: {TRAINING_FILE}")
-    df_train = pd.read_excel(TRAINING_FILE)
-    label_cols = [col for col in df_train.columns if col.startswith("Label-")]
-    if not label_cols:
-        raise ValueError("Nessuna colonna trovata con prefisso 'Label-'.")
-    label_mapping = {i: name for i, name in enumerate(label_cols)}
-    print(f"   ✅ Trovate {len(label_cols)} etichette nel dataset di training.\n")
-except Exception as e:
-    print(f"⚠️ Impossibile ricostruire la mappatura etichette: {e}")
-    label_mapping = {i: f"Label-{i+1}" for i in range(model.config.num_labels)}
+label_mapping = {int(k): v for k, v in model.config.id2label.items()}
+print(f"   ✅ Trovate {len(label_mapping)} etichette nella configurazione del modello.\n")
 
 # =========================================================
-# 4️⃣ Funzione per eseguire inferenza su un dataset
+# FUNZIONE DI INFERENZA
 # =========================================================
 def run_inference(input_filename, output_filename):
     input_path = os.path.join(DATA_DIR, input_filename)
@@ -81,15 +50,17 @@ def run_inference(input_filename, output_filename):
 
     print(f"\n📂 Esecuzione inferenza su: {input_filename}")
     df = pd.read_excel(input_path)
+    
+    # Assumi che la colonna con il testo si chiami 'Reviewtext' o simile
+    text_col = "Reviewtext" 
+    if text_col not in df.columns:
+        raise ValueError(f"❌ Il file {input_filename} deve contenere una colonna chiamata '{text_col}'.")
 
-    if "Reviewtext" not in df.columns:
-        raise ValueError(f"❌ Il file {input_filename} deve contenere una colonna chiamata 'Reviewtext'.")
-
-    df["CleanedText"] = df["Reviewtext"].apply(clean_text)
+    df["CleanedText"] = df[text_col].apply(clean_text)
     predicted_labels = []
 
-    for text in tqdm(df["CleanedText"], desc="Predicting", total=len(df)):
-        inputs = tokenizer(text, truncation=True, padding=True, return_tensors="pt", max_length=128).to(device)
+    for text in tqdm(df["CleanedText"], desc=f"Predicting on {input_filename}", total=len(df)):
+        inputs = tokenizer(text, truncation=True, padding=True, return_tensors="pt", max_length=512).to(device)
         with torch.no_grad():
             outputs = model(**inputs)
             probs = torch.sigmoid(outputs.logits).cpu().numpy()[0]
@@ -101,15 +72,14 @@ def run_inference(input_filename, output_filename):
     df.to_excel(output_path, index=False)
 
     print(f"✅ File salvato in: {output_path}")
-    print(df[["Reviewtext", "Predicted_Labels"]].head())
-    print("--------------------------------------------------\n")
+    print("--- Anteprima dei risultati ---")
+    print(df[[text_col, "Predicted_Labels"]].head())
+    print("--------------------------------\n")
 
 # =========================================================
-# 5️⃣ Esegui inferenza su tutti i dataset disponibili
+# ESECUZIONE
 # =========================================================
-for input_name, output_name in DATASETS:
-    run_inference(input_name, output_name)
-
-print("🏁 Tutte le inferenze completate con successo!")
-
-
+if __name__ == "__main__":
+    for input_name, output_name in DATASETS:
+        run_inference(input_name, output_name)
+    print("🏁 Tutte le inferenze completate con successo!")
