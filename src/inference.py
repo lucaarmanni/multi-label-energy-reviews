@@ -16,8 +16,8 @@ from utils.text_cleaning import clean_text
 
 # Percorso della cartella modelli nella repo
 BASE_MODEL_DIR = os.path.abspath("../models")
-MODEL_FOLDER = os.path.join(BASE_MODEL_DIR, "BT-aug-umBERTo-finetunedB-classifier:v0")
-MODEL_ZIP = os.path.join(BASE_MODEL_DIR, "BT-aug-umBERTo-finetunedB-classifier:v0.zip")
+MODEL_FOLDER = os.path.join(BASE_MODEL_DIR, "best-umBERTo-DBLoss-BT")
+MODEL_ZIP = os.path.join(BASE_MODEL_DIR, "best-umBERTo-DBLoss-BT.zip")
 
 # Percorso dei dataset
 DATA_DIR = os.path.abspath("../data")
@@ -89,7 +89,7 @@ def run_inference(input_filename, output_filename):
     predicted_labels = []
 
     for text in tqdm(df["CleanedText"], desc="Predicting", total=len(df)):
-        inputs = tokenizer(text, truncation=True, padding=True, return_tensors="pt", max_length=512).to(device)
+        inputs = tokenizer(text, truncation=True, padding=True, return_tensors="pt", max_length=128).to(device)
         with torch.no_grad():
             outputs = model(**inputs)
             probs = torch.sigmoid(outputs.logits).cpu().numpy()[0]
@@ -111,4 +111,5 @@ for input_name, output_name in DATASETS:
     run_inference(input_name, output_name)
 
 print("🏁 Tutte le inferenze completate con successo!")
+
 
