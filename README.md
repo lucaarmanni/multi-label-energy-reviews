@@ -1,3 +1,5 @@
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lucaarmanni/multi-label-energy-reviews/blob/main/demo_inference.ipynb)
+
 # Multi-Label Classification of Customer Reviews in the Energy Sector
 
 This repository contains the implementation and fine-tuning code for a **multi-label text classification model** applied to Italian customer reviews in the **energy sector**.
@@ -43,6 +45,7 @@ Data were preprocessed with a text cleaning function preserving casing and punct
 The fine-tuned **BT-umBERTo-DAPT** model achieved strong results on the validation set using **Macro F1** as the primary metric.  
 
 Full details are provided in the [final report](https://github.com/lucaarmanni/multi-label-energy-reviews/blob/main/reports/report.pdf).
+
 
 
 
