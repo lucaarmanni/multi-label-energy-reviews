@@ -1,5 +1,4 @@
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lucaarmanni/multi-label-energy-reviews/blob/main/notebook/demo_inference_colab.ipynb)
-
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lucaarmanni/multi-label-energy-reviews/blob/main/demo_inference.ipynb)
 # ⚡ Multi-Label Classification of Energy Sector Reviews with BT-umBERTo-DAPT
 
 Questo progetto implementa un sistema di **multi-label text classification** per recensioni di clienti nel settore energetico,  
